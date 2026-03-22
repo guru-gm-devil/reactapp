@@ -1,47 +1,36 @@
-import { useEffect, useState } from "react";
+import React, { Component } from "react";
 import UserCard from "./components/UserCard";
 import "./App.css";
 
-function App() {
+class App extends Component {
 
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  constructor(props) {
+    super(props);
 
-  useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then(res => res.json())
-      .then(data => {
-        setUsers(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  if (loading) {
-    return <h2>Loading users...</h2>;
+    this.state = {
+      users: [],
+      loading: true
+    };
   }
 
-  return (
-    <div>
+  componentDidMount() {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then(res => res.json())
+      .then(data => this.setState({ users: data, loading: false }));
+  }
 
-      <h1>User Dashboard</h1>
+  render() {
 
-      <input
-        type="text"
-        placeholder="Search user..."
-        onChange={(e) => setSearch(e.target.value)}
-      />
+    if (this.state.loading) {
+      return <h2>Loading users...</h2>;
+    }
 
-      <div className="container">
+    return (
+      <div>
 
-        {filteredUsers.map(user => (
+        <h1>User Dashboard</h1>
+
+        {this.state.users.map(user => (
           <UserCard
             key={user.id}
             name={user.name}
@@ -51,9 +40,8 @@ function App() {
         ))}
 
       </div>
-
-    </div>
-  );
+    );
+  }
 }
 
 export default App;
